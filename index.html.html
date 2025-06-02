@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SKincareAI - Personalized Skincare Routine</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'pale-peach': '#FFE6D0',
+                        'soft-pink': '#FFCBCB',
+                        'deep-rose': '#FF9E9E',
+                        'sage-green': '#C3E5C0',
+                        'teal-blue': '#78C6E0'
+                    },
+                    fontFamily: {
+                        'montserrat': ['Montserrat', 'sans-serif'],
+                        'playfair': ['Playfair Display', 'serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'montserrat', sans-serif;
+            background-color: #f8f9fa;
+            scroll-behavior: smooth;
+        }
+        
+        .hero-bg {
+            background-image: radial-gradient(circle, #ffead9, #ffe4d2, #ffded0, #ffd8d0, #ffd3d4, #ffd2db, #ffd2e3, #ffd4ea, #fedaf7, #f8e2ff, #eeeaff, #e4f1ff);
+        }
+        
+        .card-blur {
+            backdrop-filter: blur(10px);
+            background-color: rgba(255, 255, 255, 0.75);
+        }
+        
+        .progress-bar {
+            height: 6px;
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+        
+        .skin-option:hover img {
+            transform: scale(1.05);
+            transition: transform 0.3s ease;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.6s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .product-card {
+            transition: all 0.3s ease;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-white text-gray-800">
+    <!-- Landing Page -->
+    <section id="landing" class="min-h-screen hero-bg flex flex-col">
+        <nav class="flex justify-between items-center p-6 px-8">
+            <div class="flex items-center space-x-2">
+                <div class="w-10 h-10 bg-deep-rose rounded-full flex items-center justify-center">
+                    <i class="fa-solid fa-seedling text-white text-xl"></i>
+                </div>
+                <h1 class="text-3xl font-bold font-playfair text-deep-rose">SKincareAI</h1>
+            </div>
+            <div>
+                <button class="bg-white px-5 py-2 rounded-full shadow-md font-medium text-deep-rose hover:bg-pale-peach transition">
+                    About Us
+                </button>
+            </div>
+        </nav>
+
+        <div class="flex-1 flex flex-col md:flex-row items-center justify-center p-6 md:p-12">
+            <div class="md:w-1/2 lg:w-2/5 text-center md:text-left mb-12 md:mb-0 fade-in">
+                <h1 class="text-4xl md:text-5xl lg:text-6xl font-playfair font-bold mb-6 text-gray-800">
+                    Personalized Skincare Routine <br>
+                    <span class="text-deep-rose">AI-Powered</span> Results
+                </h1>
+                <p class="text-lg md:text-xl mb-8 text-gray-600 max-w-2xl">
+                    Discover your perfect skincare routine with AI technology designed to analyze your skin and recommend the best products for you.
+                </p>
+                <button id="startJourney" class="bg-deep-rose hover:bg-soft-pink text-white text-lg font-bold py-4 px-10 rounded-full shadow-lg transform transition hover:scale-105">
+                    Start Your Journey
+                </button>
+            </div>
+            <div class="md:w-1/2 lg:w-2/5 flex justify-center fade-in">
+                <div class="relative">
+                    <div class="bg-deep-rose w-64 h-64 md:w-72 md:h-72 rounded-full opacity-20 transform -rotate-6"></div>
+                    <img src="https://images.unsplash.com/photo-1599351431406-9661aba8c1f0?auto=format&fit=crop&w=500" alt="Skincare Products" class="absolute top-0 w-64 h-64 md:w-72 md:h-72 rounded-3xl object-cover shadow-xl" style="transform: rotate(3deg);">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quiz Section -->
+    <section id="quiz" class="min-h-screen hidden bg-white p-6 md:p-12 flex flex-col">
+        <div class="max-w-4xl mx-auto w-full">
+            <a href="#landing" class="text-deep-rose hover:text-soft-pink flex items-center mb-6 cursor-pointer">
+                <i class="fas fa-arrow-left mr-2"></i> Back to Home
+            </a>
+            
+            <div class="w-full mb-8">
+                <div class="flex justify-between items-center mb-2">
+                    <span id="progressText" class="text-sm text-gray-500">Question 1 of 7</span>
+                    <span id="progressPercent" class="text-sm text-gray-500">14%</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                    <div id="progressBar" class="bg-deep-rose h-2.5 rounded-full" style="width: 14%"></div>
+                </div>
+            </div>
+            
+            <div id="quizContent">
+                <!-- Question 1 -->
+                <div id="question1" class="question">
+                    <h2 class="text-2xl md:text-3xl font-playfair font-bold mb-4">What is your primary skin concern?</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+                        <div class="skin-option bg-white rounded-xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition cursor-pointer" data-answer="acne">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 rounded-full bg-soft-pink flex items-center justify-center mr-4">
+                                    <i class="fas fa-bacteria text-deep-rose"></i>
+                                </div>
+                                <h3 class="font-bold text-lg">Acne & Breakouts</h3>
+                            </div>
+                        </div>
+                        <div class="skin-option bg-white rounded-xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition cursor-pointer" data-answer="aging">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 rounded-full bg-soft-pink flex items-center justify-center mr-4">
+                                    <i class="fas fa-arrows-to-eye text-deep-rose"></i>
+                                </div>
+                                <h3 class="font-bold text-lg">Aging & Wrinkles</h3>
+                            </div>
+                        </div>
+                        <div class="skin-option bg-white rounded-xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition cursor-pointer" data-answer="dryness">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 rounded-full bg-soft-pink flex items-center justify-center mr-4">
+                                    <i class="fas fa-droplet-slash text-deep-rose"></i>
+                                </div>
+                                <h3 class="font-bold text-lg">Dryness & Flakiness</h3>
+                            </div>
+                        </div>
+                        <div class="skin-option bg-white rounded-xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition cursor-pointer" data-answer="redness">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 rounded-full bg-soft-pink flex items-center justify-center mr-4">
+                                    <i class="fas fa-temperature-full text-deep-rose"></i>
+                                </div>
+                                <h3 class="font-bold text-lg">Redness & Irritation</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-12 flex justify-between">
+                        <button class="quiz-nav invisible"></button>
+                        <button class="quiz-next bg-deep-rose text-white px-8 py-3 rounded-lg shadow hover:bg-soft-pink transition">Next →</button>
+                    </div>
+                </div>
+                
+                <!-- Question 2 -->
+                <div id="question2" class="question hidden">
+                    <h2 class="text-2xl md:text-3xl font-playfair font-bold mb-4">How would you describe your skin type?</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+                        <div class="skin-option bg-white rounded-xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition cursor-pointer" data-answer="oily">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 rounded-full bg-sage-green flex items-center justify-center mr-4">
+                                    <i class="fas fa-oil-well text-green-700"></i>
+                                </div>
+                                <h3 class="font-bold text-lg">Oily</h3>
+                            </div>
+                            <p class="text-gray-600 mt-2 text-sm">Shiny appearance, enlarged pores, prone to breakouts</p>
+                        </div>
+                        <div class="skin-option bg-white rounded-xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition cursor-pointer" data-answer="dry">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 rounded-full bg-sage-green flex items-center justify-center mr-4">
+                                    <i class="fas fa-wind text-green-700"></i>
+                                </div>
+                                <h3 class="font-bold text-lg">Dry</h3>
+                            </div>
+                            <p class="text-gray-600 mt-2 text-sm">Tightness, flakiness, rough texture, dull appearance</p>
+                        </div>
+                        <div class="skin-option bg-white rounded-xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition cursor-pointer" data-answer="combination">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 rounded-full bg-sage-green flex items-center justify-center mr-4">
+                                    <i class="fas fa-border-all text-green-700"></i>
+                                </div>
+                                <h3 class="font-bold text-lg">Combination</h3>
+                            </div>
+                            <p class="text-gray-600 mt-2 text-sm">Oily T-zone, dry cheeks, differing needs across face</p>
+                        </div>
+                        <div class="skin-option bg-white rounded-xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition cursor-pointer" data-answer="normal">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 rounded-full bg-sage-green flex items-center justify-center mr-4">
+                                    <i class="fas fa-face-smile text-green-700"></i>
+                                </div>
+                                <h3 class="font-bold text-lg">Normal</h3>
+                            </div>
+                            <p class="text-gray-600 mt-2 text-sm">Balanced moisture, minimal concerns, few imperfections</p>
+                        </div>
+                    </div>
+                    <div class="mt-12 flex justify-between">
+                        <button class="quiz-prev text-gray-600 hover:text-deep-rose transition flex items-center">
+                            <i class="fas fa-arrow-left mr-2"></i> Previous
+                        </button>
+                        <button class="quiz-next bg-deep-rose text-white px-8 py-3 rounded-lg shadow hover:bg-soft-pink transition">Next →</button>
+                    </div>
+                </div>
+                
+                <!-- Question 3 -->
+                <div id="question3" class="question hidden">
+                    <h2 class="text-2xl md:text-3xl font-playfair font-bold mb-4">Do you have sensitive skin?</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+                        <div class="skin-option bg-white rounded-xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition cursor-pointer" data-answer="yes">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 rounded-full bg-teal-blue flex items-center justify-center mr-4">
+                                    <i class="fas fa-heart-crack text-blue-700"></i>
+                                </div>
+                                <h3 class="font-bold text-lg">Yes</h3>
+                            </div>
+                            <p class="text-gray-600 mt-2 text-sm">Often stings, itches, turns red, or reacts to products</p>
+                        </div>
+                        <div class="skin-option bg-white rounded-xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition cursor-pointer" data-answer="no">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 rounded-full bg-teal-blue flex items-center justify-center mr-4">
+                                    <i class="fas fa-check-circle text-blue-700"></i>
+                                </div>
+                                <h3 class="font-bold text-lg">No</h3>
+                            </div>
+                            <p class="text-gray-600 mt-2 text-sm">Tolerates most products without irritation</p>
+                        </div>
+                    </div>
+                    <div class="mt-12 flex justify-between">
+                        <button class="quiz-prev text-gray-600 hover:text-deep-rose transition flex items-center">
+                            <i class="fas fa-arrow-left mr-2"></i> Previous
+                        </button>
+                        <button class="quiz-next bg-deep-rose text-white px-8 py-3 rounded-lg shadow hover:bg-soft-pink transition">Next →</button>
+                    </div>
+                </div>
+                
+                <!-- Question 4 -->
+                <div id="question4" class="question hidden">
+                    <h2 class="text-2xl md:text-3xl font-playfair font-bold mb-4">How old are you?</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+                        <div class="skin-option bg-white rounded-xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition cursor-pointer" data-answer="18-25">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 rounded-full bg-pale-peach flex items-center justify-center mr-4">
+                                    <i class="fas fa-user text-orange-500"></i>
+                                </div>
+                                <h3 class="font-bold text-lg">18 - 25</h3>
+                            </div>
+                            <p class="text-gray-600 mt-2 text-sm">Focus on prevention and managing oiliness/acne</p>
+                        </div>
+                        <div class="skin-option bg-white rounded-xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition cursor-pointer" data-answer="26-35">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 rounded-full bg-pale-peach flex items-center justify-center mr-4">
+                                    <i class="fas fa-user-clock text-orange-500"></i>
+                                </div>
+                                <h3 class="font-bold text-lg">26 - 35</h3>
+                            </div>
+                            <p class="text-gray-600 mt-2 text-sm">Early signs of aging, hydration, collagen production</p>
+                        </div>
+                        <div class="skin-option bg-white rounded-xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition cursor-pointer" data-answer="36-45">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 rounded-full bg-pale-peach flex items-center justify-center mr-4">
+                                    <i class="fas fa-user-tie text-orange-500"></i>
+                                </div>
+                                <h3 class="font-bold text-lg">36 - 45</h3>
+                            </div>
+                            <p class="text-gray-600 mt-2 text-sm">Targeted anti-aging, firming, pigmentation concerns</p>
+                        </div>
+                        <div class="skin-option bg-white rounded-xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition cursor-pointer" data-answer="45+">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 rounded-full bg-pale-peach flex items-center justify-center mr-4">
+                                    <i class="fas fa-crown text-orange-500"></i>
+                                </div>
+                                <h3 class="font-bold text-lg">45+</h3>
+                            </div>
+                            <p class="text-gray-600 mt-2 text-sm">Intensive hydration, firming, elasticity restoration</p>
+                        </div>
+                    </div>
+                    <div class="mt-12 flex justify-between">
+                        <button class="quiz-prev text-gray-600 hover:text-deep-rose transition flex items-center">
+                            <i class="fas fa-arrow-left mr-2"></i> Previous
+                        </button>
+                        <button class="quiz-next bg-deep-rose text-white px-8 py-3 rounded-lg shadow hover:bg-soft-pink transition">Next →</button>
+                    </div>
+                </div>
+                
+                <!-- Question 5 -->
+                <div id="question5" class="question hidden">
+                    <h2 class="text-2xl md:text-3xl font-playfair font-bold mb-4">How much time can you dedicate to skincare daily?</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mt-8">
+                        <div class="skin-option bg-white rounded-xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition cursor-pointer" data-answer="quick">
+                            <div class="flex flex-col items-center">
+                                <div class="w-10 h-10 rounded-full bg-soft-pink flex items-center justify-center mb-4">
+                                    <i class="fas fa-bolt text-deep-rose"></i>
+                                </div>
+                                <h3 class="font-bold text-lg">Quick</h3>
+                                <p class="text-gray-600 mt-2 text-sm text-center">3-5 min</p>
+                            </div>
+                        </div>
+                        <div class="skin-option bg-white rounded-xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition cursor-pointer" data-answer="moderate">
+                            <div class="flex flex-col items-center">
+                                <div class="w-10 h-10 rounded-full bg-soft-pink flex items-center justify-center mb-4">
+                                    <i class="fas fa-mug-hot text-deep-rose"></i>
+                                </div>
+                                <h3 class="font-bold text-lg">Moderate</h3>
+                                <p class="text-gray-600 mt-2 text-sm text-center">10 min</p>
+                            </div>
+                        </div>
+                        <div class="skin-option bg-white rounded-xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition cursor-pointer" data-answer="dedicated">
+                            <div class="flex flex-col items-center">
+                                <div class="w-10 h-10 rounded-full bg-soft-pink flex items-center justify-center mb-4">
+                                    <i class="fas fa-hourglass text-deep-rose"></i>
+                                </div>
+                                <h3 class="font-bold text-lg">Dedicated</h3>
+                                <p class="text-gray-600 mt-2 text-sm text-center">15-20 min</p>
+                            </div>
+                        </div>
+                        <div class="skin-option bg-white rounded-xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition cursor-pointer" data-answer="luxury">
+                            <div class="flex flex-col items-center">
+                                <div class="w-10 h-10 rounded-full bg-soft-pink flex items-center justify-center mb-4">
+                                    <i class="fas fa-spa text-deep-rose"></i>
+                                </div>
+                                <h3 class="font-bold text-lg">Luxury</h3>
+                                <p class="text-gray-600 mt-2 text-sm text-center">30+ min</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-12 flex justify-between">
+                        <button class="quiz-prev text-gray-600 hover:text-deep-rose transition flex items-center">
+                            <i class="fas fa-arrow-left mr-2"></i> Previous
+                        </button>
+                        <button class="quiz-next bg-deep-rose text-white px-8 py-3 rounded-lg shadow hover:bg-soft-pink transition">Next →</button>
+                    </div>
+                </div>
+                
+                <!-- Question 6 -->
+                <div id="question6" class="question hidden">
+                    <h2 class="text-2xl md:text-3xl font-playfair font-bold mb-4">What is your skin tone?</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-8">
+                        <div class="skin-option rounded-full cursor-pointer group" data-answer="fair">
+                            <div class="w-16 h-16 bg-skin-1 rounded-full mx-auto group-hover:border-2 group-hover:border-deep-rose transition" style="background-color: #f5d7c3;"></div>
+                            <p class="text-center mt-2 text-sm">Fair</p>
+                        </div>
+                        <div class="skin-option rounded-full cursor-pointer group" data-answer="light">
+                            <div class="w-16 h-16 bg-skin-2 rounded-full mx-auto group-hover:border-2 group-hover:border-deep-rose transition" style="background-color: #e8c0a3;"></div>
+                            <p class="text-center mt-2 text-sm">Light</p>
+                        </div>
+                        <div class="skin-option rounded-full cursor-pointer group" data-answer="medium">
+                            <div class="w-16 h-16 bg-skin-3 rounded-full mx-auto group-hover:border-2 group-hover:border-deep-rose transition" style="background-color: #c89e7c;"></div>
+                            <p class="text-center mt-2 text-sm">Medium</p>
+                        </div>
+                        <div class="skin-option rounded-full cursor-pointer group" data-answer="olive">
+                            <div class="w-16 h-16 bg-skin-4 rounded-full mx-auto group-hover:border-2 group-hover:border-deep-rose transition" style="background-color: #a67b5a;"></div>
+                            <p class="text-center mt-2 text-sm">Olive</p>
+                        </div>
+                        <div class="skin-option rounded-full cursor-pointer group" data-answer="tan">
+                            <div class="w-16 h-16 bg-skin-5 rounded-full mx-auto group-hover:border-2 group-hover:border-deep-rose transition" style="background-color: #8c5e3d;"></div>
+                            <p class="text-center mt-2 text-sm">Tan</p>
+                        </div>
+                        <div class="skin-option rounded-full cursor-pointer group" data-answer="deep">
+                            <div class="w-16 h-16 bg-skin-6 rounded-full mx-auto group-hover:border-2 group-hover:border-deep-rose transition" style="background-color: #5a3a2b;"></div>
+                            <p class="text-center mt-2 text-sm">Deep</p>
+                        </div>
+                        <div class="skin-option rounded-full cursor-pointer group" data-answer="rich">
+                            <div class="w-16 h-16 bg-skin-7 rounded-full mx-auto group-hover:border-2 group-hover:border-deep-rose transition" style="background-color: #3d2417;"></div>
+                            <p class="text-center mt-2 text-sm">Rich</p>
+                        </div>
+                        <div class="skin-option rounded-full cursor-pointer group" data-answer="dark">
+                            <div class="w-16 h-16 bg-skin-8 rounded-full mx-auto group-hover:border-2 group-hover:border-deep-rose transition" style="background-color: #22150d;"></div>
+                            <p class="text-center mt-2 text-sm">Dark</p>
+                        </div>
+                    </div>
+                    <div class="mt-12 flex justify-between">
+                        <button class="quiz-prev text-gray-600 hover:text-deep-rose transition flex items-center">
+                            <i class="fas fa-arrow-left mr-2"></i> Previous
+                        </button>
+                        <button class="quiz-next bg-deep-rose text-white px-8 py-3 rounded-lg shadow hover:bg-soft-pink transition">Next →</button>
+                    </div>
+                </div>
+                
+                <!-- Question 7 -->
+                <div id="question7" class="question hidden">
+                    <h2 class="text-2xl md:text-3xl font-playfair font-bold mb-4">Upload a photo of your face (optional)</h2>
+                    <p class="text-gray-600 mb-8">For the most accurate analysis, upload a clear photo in natural light. Our AI will examine your skin texture, pore size, and specific concerns.</p>
+                    
+                    <div class="border-2 border-dashed border-soft-pink rounded-xl p-8 text-center">
+                        <div class="w-24 h-24 bg-pale-peach rounded-full flex items-center justify-center mx-auto mb-6">
+                            <i class="fas fa-cloud-arrow-up text-deep-rose text-4xl"></i>
+                        </div>
+                        <p class="font-bold">Drag & Drop your photo here</p>
+                        <p class="text-gray-500 text-sm mt-1">or click to browse files</p>
+                        <input type="file" id="skinPhoto" accept="image/*" class="hidden">
+                        <button id="uploadBtn" class="bg-white border border-deep-rose text-deep-rose mt-4 px-6 py-2 rounded-lg hover:bg-pale-peach transition">
+                            Select File
+                        </button>
+                    </div>
+                    
+                    <div class="mt-12 flex justify-between">
+                        <button class="quiz-prev text-gray-600 hover:text-deep-rose transition flex items-center">
+                            <i class="fas fa-arrow-left mr-2"></i> Previous
+                        </button>
+                        <button id="finishQuiz" class="bg-deep-rose text-white px-8 py-3 rounded-lg shadow hover:bg-soft-pink transition">Finish & Analyze</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Results Section -->
+    <section id="results" class="min-h-screen hidden bg-white p-6 md:p-12">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-16">
+                <h1 class="text-3xl md:text-5xl font-playfair font-bold text-deep-rose mb-4">Your Personalized Skincare Routine</h1>
+                <p class="text-lg text-gray-600 max-w-3xl mx-auto">
+                    Based on your skin profile and AI analysis, we recommend these products for optimal results. Developed specifically for your combination skin type and anti-aging concerns.
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+                <!-- Cleanser -->
+                <div class="product-card bg-white rounded-2xl p-6 border border-gray-100 shadow-md">
+                    <div class="flex justify-between items-start mb-6">
+                        <div>
+                            <span class="inline-block px-3 py-1 bg-pale-peach text-deep-rose rounded-full text-sm font-bold">Step 1</span>
+                            <h2 class="text-2xl font-bold mt-3">Cleanser</h2>
+                        </div>
+                        <div class="w-14 h-14 bg-deep-rose rounded-xl flex items-center justify-center">
+                            <i class="fas fa-pump-soap text-white text-2xl"></i>
+                        </div>
+                    </div>
+                    <div class="border border-soft-pink rounded-xl p-1 mb-6">
+                        <img src="https://images.unsplash.com/photo-1591360232585-3e77ab90d77a?auto=format&fit=crop&w=300" alt="Cleanser" class="w-full h-48 rounded-lg object-cover">
+                    </div>
+                    <h3 class="font-bold text-xl mb-2">CeraVe Hydrating Facial Cleanser</h3>
+                    <p class="text-gray-600 mb-4">Gentle cleanser that hydrates while removing dirt, oil, and makeup without stripping the skin.</p>
+                    <div class="bg-sage-green bg-opacity-30 p-4 rounded-lg text-sm mb-6">
+                        <div class="flex items-start">
+                            <i class="fas fa-info-circle mt-1 mr-2 text-green-800"></i>
+                            <p class="text-green-800">AI Note: Contains hyaluronic acid and ceramides that are ideal for maintaining moisture barrier.</p>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="font-bold text-deep-rose">$14.99</span>
+                        <div class="flex space-x-3">
+                            <a href="https://www.amazon.com/dp/B0019P3X8K" target="_blank" class="bg-deep-rose hover:bg-soft-pink text-white px-5 py-2 rounded-lg text-sm transition">Amazon</a>
+                            <a href="https://www.target.com/p/cerave-hydrating-facial-cleanser-16-fl-oz/-/A-13684093" target="_blank" class="bg-gray-200 hover:bg-gray-300 px-5 py-2 rounded-lg text-sm transition">Target</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Serum -->
+                <div class="product-card bg-white rounded-2xl p-6 border border-gray-100 shadow-md">
+                    <div class="flex justify-between items-start mb-6">
+                        <div>
+                            <span class="inline-block px-3 py-1 bg-pale-peach text-deep-rose rounded-full text-sm font-bold">Step 2</span>
+                            <h2 class="text-2xl font-bold mt-3">Serum</h2>
+                        </div>
+                        <div class="w-14 h-14 bg-deep-rose rounded-xl flex items-center justify-center">
+                            <i class="fas fa-vial text-white text-2xl"></i>
+                        </div>
+                    </div>
+                    <div class="border border-soft-pink rounded-xl p-1 mb-6">
+                        <img src="https://images.unsplash.com/photo-1591377181561-a92ef0bafd3e?auto=format&fit=crop&w=300" alt="Serum" class="w-full h-48 rounded-lg object-cover">
+                    </div>
+                    <h3 class="font-bold text-xl mb-2">The Ordinary Hyaluronic Acid 2% + B5</h3>
+                    <p class="text-gray-600 mb-4">Lightweight serum that provides intense hydration with hyaluronic acid and vitamin B5.</p>
+                    <div class="bg-sage-green bg-opacity-30 p-4 rounded-lg text-sm mb-6">
+                        <div class="flex items-start">
+                            <i class="fas fa-info-circle mt-1 mr-2 text-green-800"></i>
+                            <p class="text-green-800">AI Note: The low molecular weight HA penetrates deeper for enhanced hydration.</p>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="font-bold text-deep-rose">$9.99</span>
+                        <div class="flex space-x-3">
+                            <a href="https://www.amazon.com/dp/B01KLSZDVE" target="_blank" class="bg-deep-rose hover:bg-soft-pink text-white px-5 py-2 rounded-lg text-sm transition">Amazon</a>
+                            <a href="https://www.walmart.com/ip/The-Ordinary-Hyaluronic-Acid-2-B5-30ml-1oz/54831686" target="_blank" class="bg-gray-200 hover:bg-gray-300 px-5 py-2 rounded-lg text-sm transition">Walmart</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Moisturizer -->
+                <div class="product-card bg-white rounded-2xl p-6 border border-gray-100 shadow-md">
+                    <div class="flex justify-between items-start mb-6">
+                        <div>
+                            <span class="inline-block px-3 py-1 bg-pale-peach text-deep-rose rounded-full text-sm font-bold">Step 3</span>
+                            <h2 class="text-2xl font-bold mt-3">Moisturizer</h2>
+                        </div>
+                        <div class="w-14 h-14 bg-deep-rose rounded-xl flex items-center justify-center">
+                            <i class="fas fa-jug-detergent text-white text-2xl"></i>
+                        </div>
+                    </div>
+                    <div class="border border-soft-pink rounded-xl p-1 mb-6">
+                        <img src="https://images.unsplash.com/photo-1591377181561-f0b23bffb340?auto=format&fit=crop&w=300" alt="Moisturizer" class="w-full h-48 rounded-lg object-cover">
+                    </div>
+                    <h3 class="font-bold text-xl mb-2">Neutrogena Hydro Boost Gel-Cream</h3>
+                    <p class="text-gray-600 mb-4">Oil-free gel-cream that provides intense hydration for 72 hours with hyaluronic acid.</p>
+                    <div class="bg-sage-green bg-opacity-30 p-4 rounded-lg text-sm mb-6">
+                        <div class="flex items-start">
+                            <i class="fas fa-info-circle mt-1 mr-2 text-green-800"></i>
+                            <p class="text-green-800">AI Note: The non-comedogenic formula is perfect for combination skin and daily wear.</p>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="font-bold text-deep-rose">$19.99</span>
+                        <div class="flex space-x-3">
+                            <a href="https://www.amazon.com/dp/B015XUO4JM" target="_blank" class="bg-deep-rose hover:bg-soft-pink text-white px-5 py-2 rounded-lg text-sm transition">Amazon</a>
+                            <a href="https://www.target.com/p/neutrogena-hydro-boost-hydrating-gel-cream-fragrance-free-1-7oz/-/A-75562405" target="_blank" class="bg-gray-200 hover:bg-gray-300 px-5 py-2 rounded-lg text-sm transition">Target</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-20 bg-pale-peach bg-opacity-40 rounded-2xl p-8">
+                <h2 class="text-2xl font-playfair font-bold text-center mb-6">Your Daily Routine</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="bg-white rounded-xl p-6">
+                        <div class="flex items-center mb-4">
+                            <div class="w-12 h-12 bg-deep-rose rounded-full flex items-center justify-center mr-4">
+                                <i class="fas fa-sun text-white"></i>
+                            </div>
+                            <h3 class="text-xl font-bold">Morning Routine</h3>
+                        </div>
+                        <ol class="list-decimal list-inside space-y-2 pl-2">
+                            <li>Cleanse with recommended product</li>
+                            <li>Apply hyaluronic acid serum</li>
+                            <li>Apply moisturizer</li>
+                            <li>Apply SPF 30+ sunscreen</li>
+                        </ol>
+                    </div>
+                    
+                    <div class="bg-white rounded-xl p-6">
+                        <div class="flex items-center mb-4">
+                            <div class="w-12 h-12 bg-deep-rose rounded-full flex items-center justify-center mr-4">
+                                <i class="fas fa-moon text-white"></i>
+                            </div>
+                            <h3 class="text-xl font-bold">Evening Routine</h3>
+                        </div>
+                        <ol class="list-decimal list-inside space-y-2 pl-2">
+                            <li>Double cleanse (oil cleanser then water-based)</li>
+                            <li>Apply serum</li>
+                            <li>Apply anti-aging retinol serum (2-3x week)</li>
+                            <li>Apply moisturizer</li>
+                        </ol>
+                    </div>
+                    
+                    <div class="bg-white rounded-xl p-6">
+                        <div class="flex items-center mb-4">
+                            <div class="w-12 h-12 bg-deep-rose rounded-full flex items-center justify-center mr-4">
+                                <i class="fas fa-calendar text-white"></i>
+                            </div>
+                            <h3 class="text-xl font-bold">Weekly Treatment</h3>
+                        </div>
+                        <ol class="list-decimal list-inside space-y-2 pl-2">
+                            <li>Exfoliate with AHA/BHA (2x week)</li>
+                            <li>Apply hydrating face mask (1x week)</li>
+                            <li>Eye area treatment (3x week)</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-16">
+                <button id="restartBtn" class="bg-deep-rose hover:bg-soft-pink text-white text-lg font-bold py-3 px-8 rounded-full shadow-lg transition mr-4">
+                    Take Quiz Again
+                </button>
+                <button class="bg-white border border-deep-rose text-deep-rose text-lg font-bold py-3 px-8 rounded-full shadow-lg transition">
+                    Save My Routine
+                </button>
+            </div>
+        </div>
+    </section>
+    
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <div class="flex items-center space-x-2 mb-4">
+                        <div class="w-8 h-8 bg-deep-rose rounded-full flex items-center justify-center">
+                            <i class="fa-solid fa-seedling text-white"></i>
+                        </div>
+                        <h1 class="text-2xl font-playfair font-bold">SKincareAI</h1>
+                    </div>
+                    <p class="text-gray-400 mb-4">
+                        Your personal AI dermatologist creating customized skincare routines for healthier, happier skin.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white">
+                            <i class="fab fa-facebook"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white">
+                            <i class="fab fa-tiktok"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white">
+                            <i class="fab fa-pinterest"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-bold mb-4">Navigation</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white">Home</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">About Us</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">How It Works</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Blog</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-bold mb-4">Resources</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white">Skin Health Guide</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Ingredient Library</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Skin Concerns</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Dermatologist Q&A</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">FAQs</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-bold mb-4">Subscribe</h3>
+                    <p class="text-gray-400 mb-4">
+                        Get skincare tips and exclusive offers delivered to your inbox
+                    </p>
+                    <form class="flex">
+                        <input type="email" placeholder="Your email" class="bg-gray-800 text-white px-4 py-2 rounded-l focus:outline-none w-full">
+                        <button class="bg-deep-rose text-white px-4 py-2 rounded-r">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-12 pt-8 text-center text-gray-500 text-sm">
+                <p>© 2023 SKincareAI. All rights reserved. This website is for demonstration purposes only.</p>
+            </div>
+        </div>
+    </footer>
+    
+    <script>
+        // Quiz logic
+        document.addEventListener('DOMContentLoaded', function() {
+            const startBtn = document.getElementById('startJourney');
+            const quizSection = document.getElementById('quiz');
+            const landingSection = document.getElementById('landing');
+            const resultsSection = document.getElementById('results');
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
+            const progressPercent = document.getElementById('progressPercent');
+            const restartBtn = document.getElementById('restartBtn');
+            
+            const questions = document.querySelectorAll('.question');
+            const skinOptions = document.querySelectorAll('.skin-option');
+            const nextBtns = document.querySelectorAll('.quiz-next');
+            const prevBtns = document.querySelectorAll('.quiz-prev');
+            const finishQuiz = document.getElementById('finishQuiz');
+            const uploadBtn = document.getElementById('uploadBtn');
+            
+            let currentQuestion = 0;
+            
+            // Start quiz button
+            startBtn.addEventListener('click', function() {
+                landingSection.classList.add('hidden');
+                quizSection.classList.remove('hidden');
+            });
+            
+            // Skin option selection
+            skinOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    // Remove active class from siblings
+                    const siblings = this.parentElement.querySelectorAll('.skin-option');
+                    siblings.forEach(el => el.classList.remove('border-deep-rose', 'border-2'));
+                    
+                    // Add active class to selected option
+                    this.classList.add('border-deep-rose', 'border-2');
+                });
+            });
+            
+            // Next button functionality
+            nextBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    showQuestion(currentQuestion + 1);
+                });
+            });
+            
+            // Previous button functionality
+            prevBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    showQuestion(currentQuestion - 1);
+                });
+            });
+            
+            // File upload button
+            uploadBtn.addEventListener('click', function() {
+                document.getElementById('skinPhoto').click();
+            });
+            
+            // Finish quiz
+            finishQuiz.addEventListener('click', function() {
+                quizSection.classList.add('hidden');
+                resultsSection.classList.remove('hidden');
+                window.scrollTo(0, 0);
+            });
+            
+            // Restart quiz
+            restartBtn.addEventListener('click', function() {
+                resultsSection.classList.add('hidden');
+                landingSection.classList.remove('hidden');
+                showQuestion(0);
+            });
+            
+            // Show specific question
+            function showQuestion(index) {
+                if (index < 0 || index >= questions.length) return;
+                
+                // Hide all questions
+                questions.forEach(q => q.classList.add('hidden'));
+                
+                // Show current question
+                questions[index].classList.remove('hidden');
+                
+                // Update current question index
+                currentQuestion = index;
+                
+                // Update progress bar
+                const progress = ((index + 1) / questions.length) * 100;
+                progressBar.style.width = `${progress}%`;
+                progressText.textContent = `Question ${index + 1} of ${questions.length}`;
+                progressPercent.textContent = `${Math.round(progress)}%`;
+            }
+        });
+    </script>
+</body>
+</html>
